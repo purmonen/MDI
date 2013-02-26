@@ -16,6 +16,6 @@ if (!in_array($page, $pages)) {
 
 require_once 'top.php';
 require_once $page . '.php';
-require_once 'bottom.php';
 echo "<script>selectLink('$page')</script>"; 
+require_once 'bottom.php';
 ?>

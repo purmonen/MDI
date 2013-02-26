@@ -1,7 +1,4 @@
-
-
-
-
+"use strict";
 
 //This function is called when the protoype page is loaded.
 //It sets up the environment, creating a ticket machine and a group of customers.
@@ -18,15 +15,17 @@ function prototypeMain() {
         'Paul': new Customer('Paul'),
         'Mattias': new Customer('Mattias'),
         'Lukas': new Customer('Lukas')
-    }
+    };
+
+    window.customer = null;
     
     //Loads the customers into the drop-down list
     var e = $('customers-list');
-    for (var i in customers) {
-        customers[i].useTicketMachine(ticketMachine);
+    for (var name in customers) {
+        customers[name].useTicketMachine(ticketMachine);
         var option = document.createElement('option');
-        option.value = i;
-        option.textContent = i;
+        option.value = name;
+        option.textContent = name;
         e.appendChild(option);
     }
     changeCustomer();
@@ -36,7 +35,7 @@ function prototypeMain() {
 
 //Change the current customer
 function changeCustomer() {
-    customer = customers[$('customers-list').value];
+    customer = window.customers[$('customers-list').value];
     customer.updateScreen();
 }
 
@@ -75,7 +74,7 @@ function Customer(name) {
     this.cancelBook = function() {
         this.ticketMachine.showAttractions();
     };
-    
+
     //Customer decides to unbook a ticket - ticketMachine shows the start page
     this.unbookTicket = function() {
         this.ticketMachine.showStart();
@@ -95,12 +94,12 @@ function Customer(name) {
             this.ticketMachine.getTicket();
             this.updateScreen();
         }
-    }
+    };
     
     //Does the customer have a ticket?
     this.hasTicket = function() {
         return this.ticket !== null;
-    }   
+    };
     
     //Exit the use of the ticketMachine
     this.exit = function() {
@@ -109,23 +108,19 @@ function Customer(name) {
     
     //Update the Customer information visible on screen
     this.updateScreen = function() {
-        if (this.hasTicket()) {
-            $('customer-ticket').textContent = this.ticket.toString();
-        } else {
-            $('customer-ticket').textContent = 'Ingen';
-        }
+        $('customer-ticket').textContent = (this.ticket ? this.ticket.toString() : 'Ingen');
     };
 }
 
 //Ticket machine class
 function TicketMachine() {
-    //The id's of the pages that can be shown on the ticketMachine screen
+    //The id's of the pages that can be shown on the ticket machine screen
     this.pages = [
         'start', 'attractions', 'confirm-ticket', 
         'remove-ticket', 'show-ticket'
     ];
                   
-    //The attractions for which the ticketMachine can book you a ticket
+    //The attractions for which the ticket machine can book you a ticket
     this.attractions = [
         new Attraction('Eclipse'),
         new Attraction('Fritt fall'),
@@ -134,7 +129,7 @@ function TicketMachine() {
         new Attraction('Vilda musen')
     ];
                         
-    //A list of customers currently using the ticketMachine
+    //A list of customers currently using the ticket machine
     this.customers = [];
     //Currently displayed page
     this.page = 'start';
@@ -149,15 +144,12 @@ function TicketMachine() {
     this.showCustomers = function() {
         var e = $('customers');
         e.textContent = '';
-        var tm = this;
-        for (var i in this.customers) {
-            (function(i) {
-                var p = document.createElement('p');
-                p.className = 'customer';
-                p.textContent = tm.customers[i].name;
-                e.appendChild(p);
-            })(i);
-        }
+        this.customers.forEach(function(c) {
+            var p = document.createElement('p');
+            p.className = 'customer';
+            p.textContent = c.name;
+            e.appendChild(p);
+        });
     };
     
     //A customer can only be scanned once and only when the start page is visible
@@ -180,14 +172,14 @@ function TicketMachine() {
     };
     
     //Removes a customer from the list of customers currently using the machine
-    this.removeCustomer = function(customer) {
+    this.removeCustomer = function(index) {
         //If ticket is booked, you can't remove yourself
         if (this.page === 'show-ticket') {
             return;
         }
-        this.customers.splice(customer, 1);
+        this.customers.splice(index, 1);
         this.showCustomers();
-        if (this.customers.length === 0) {
+        if (!this.customers.length) {
             this.reset();   
         }
     };
@@ -201,15 +193,16 @@ function TicketMachine() {
     
     //A couple of 'show page' functions
     this.showStart = function() {
-
         this.showCustomers();
         this.show('start');
     };
     
     this.showAttractions = function() {
-        if (this.customers.length > 0) { //If no customer use the machine it won't proceed
-            this.show('attractions');
+        if (!this.customers.length) {
+            // If no customer uses the machine, don't proceed.
+            return;
         }
+        this.show('attractions');
     };
     
     //Creates the ticket that might be booked for display
@@ -231,23 +224,20 @@ function TicketMachine() {
     //Gives away a ticket to all customers currently using the machine
     //and then resets.
     this.getTicket = function() {
-        for (i in this.customers) {
-            this.customers[i].ticket = this.ticket;
-        }
+        var self = this;
+        this.customers.forEach(function(c) {
+            c.ticket = self.ticket;
+        });
         this.reset();
     };
     
     //Shows the page on it's screen
     this.show = function(page) {
         this.page = page;
-        for (var i in this.pages) {
-            var e = $(this.pages[i]);
-            if (this.pages[i] === page) {
-                e.style.display = 'block';
-            } else {
-                e.style.display = 'none';
-            }
-        }
+        this.pages.forEach(function(p) {
+            var e = $(p);
+            e.style.display = (p === page ? 'block' : 'none');
+        });
     };
     
     this.setLanguage = function() {
@@ -262,41 +252,38 @@ function TicketMachine() {
         }
     };
 
-    //Updates the attractions on screen since the queueing times changes
+    // Updates the attractions on screen since the queueing times changes
     this.updateAttractions = function() {
         var e = $('insert-attractions');
         e.textContent = '';
         var tm = this;
-        for (var i = 0; i < tm.attractions.length; i++) {
-            (function(i) {
-                var p = document.createElement('p');
-                p.className = 'button';
-                p.onclick = function() { customer.selectAttraction(i); };
-                p.textContent = tm.attractions[i].toString()
-                e.appendChild(p);
-            })(i);
-        }
+        this.attractions.forEach(function(a, i) {
+            var p = document.createElement('p');
+            p.className = 'button';
+            p.onclick = function() { window.customer.selectAttraction(i); };
+            p.textContent = tm.attractions[i].toString()
+            e.appendChild(p);
+        });
     }
-    
-    //Updates the clock on the ticketMachine screen 
+
+    // Updates the clock on the ticket machine screen 
     this.updateClock = function() {
         var date = new Date();
         $('clock').textContent = timePad(date.getHours()) + ':' + timePad(date.getMinutes());
     
-        //Update queue times
+        // Update queue times
         if (date.getSeconds() % 8 === 0) {   
-            for (i in ticketMachine.attractions) {
-                var attraction = this.attractions[i];
-                attraction.queueTime += Math.round(Math.random())
-                if (attraction.queueTime > 0) {
-                    this.attractions[i].queueTime -= Math.round(Math.random())
-                }
-            }
+            this.attractions.forEach(function(a) {
+                if (Math.random() * 2 >= 1)
+                    ++a.queueTime;
+                if (a.queueTime > 0 && Math.random() * 2 >= 1)
+                    --a.queueTime;
+            });
             this.updateAttractions();
         }
     };
 
-    //Exits the ticketMachine
+    //Exits the ticket machine
     this.reset = function() {
         this.ticket = null;
         this.customers = new Array();
@@ -342,7 +329,7 @@ var swedishDictionary = {
 
 
 //Handle languages
-languages = {
+window.languages = {
     'english': englishDictionary,
     'swedish': swedishDictionary
 };
@@ -390,12 +377,9 @@ function $c(c) {
     return document.getElementByClass(c);
 }
 
-//pads time so that 1:1 -> 01:01
+// stringifies a number to two digits, with possible leading zero
 function timePad(time) {
-    if (time < 10) {
-        return "0" + time;
-    }
-    return time;
+    return (time < 10 ? "0" : "") + time;
 }
 
 //checks if array contains data
