@@ -50,8 +50,9 @@ li {
     display: block;
     color: white;
     font-size: 1.3em;
+    line-height: 50px;
     float: left;
-    padding: 12px 14px 15px;
+    padding: 0 14px 0;
     text-decoration: none;
 }
 

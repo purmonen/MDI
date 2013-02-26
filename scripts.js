@@ -162,7 +162,7 @@ function TicketMachine() {
         if (this.page === 'show-ticket') {
             return;
         }
-        this.customers = remove(this.customers, customer);
+        this.customers.splice(customer, 1);
         this.showCustomers();
         if (this.customers.length === 0) {
             this.reset();   
@@ -304,17 +304,6 @@ function $(id) {
 //pads time so that 1:1 -> 01:01
 function timePad(time) {
     return (time < 10) ? "0" + time : time;
-}
-
-//removes element at index from array
-function remove(array, index) {
-    var newArray = new Array();
-    for (i in array) {
-        if (i != index) {
-            newArray.push(array[i]);
-        }
-    }
-    return newArray;
 }
 
 //checks if array contains data
