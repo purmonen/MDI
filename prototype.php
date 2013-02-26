@@ -55,6 +55,6 @@
 </div>
 </div>
 <script>
-simulateTicketMachine();
+prototypeMain();
 document.onload = setInterval("ticketMachine.updateClock()", 1000);
 </script>

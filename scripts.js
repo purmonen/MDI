@@ -1,4 +1,6 @@
-function simulateTicketMachine() {
+//This function is called when the protoype page is loaded.
+//It sets up the environment, creating a ticket machine and a group of customers.
+function prototypeMain() {
     ticketMachine = new TicketMachine();
     ticketMachine.show('start');
     
@@ -10,6 +12,8 @@ function simulateTicketMachine() {
     customers['Mattias'] = new Customer('Mattias');
     customers['Lukas'] = new Customer('Lukas');
     
+    
+    //Loads the customers into the drop-down list
     e = $('customers-list');
     for (i in customers) {
         customers[i].useTicketMachine(ticketMachine);
@@ -20,12 +24,14 @@ function simulateTicketMachine() {
     ticketMachine.updateClock();
 }
 
+//Change the current customer
 function changeCustomer() {
     customer = customers[$('customers-list').value];
     customer.updateScreen();
 }
 
-//Customer class
+//Customer class - what you do when you click on something on the page
+//is calling methods from this class.
 function Customer(name) {
     this.name = name;
     this.ticket = null;
@@ -39,32 +45,41 @@ function Customer(name) {
         this.ticketMachine.scan(this);
     }
     
+    
+    //Customer clicks on screen to start - ticketMachine shows attractions
     this.start = function() {
         this.ticketMachine.showAttractions();
     }
     
+    //Customer clicks on an attraction - ticketMachine shows the confirm page
     this.selectAttraction = function(attraction) {
         this.ticketMachine.showConfirmPage(attraction);
     }
     
+    //Customer decides to book a ticket - ticketMachine shows the ticket
     this.bookTicket = function() {
         this.ticketMachine.showTicket();
     }
     
+    //Customer decides to cancel the book of a ticket
+    this.cancelBook = function() {
+        this.ticketMachine.showAttractions();
+    }
+    
+    //Customer decides to unbook a ticket - ticketMachine shows the start page
     this.unbookTicket = function() {
         this.ticketMachine.showStart();
         this.ticket = null;
         this.updateScreen();
     }
     
+    //Customer decides not to unbook - 
     this.cancelUnbook = function() {
         this.ticketMachine.cancelUnbook();
     }
     
-    this.cancelBook = function() {
-        this.ticketMachine.showAttractions();
-    }
-    
+    //Customer takes the ticket from the machine which can only be done
+    //if the machine actually has one
     this.getTicket = function() {
         if (ticketMachine.hasTicket()) {
             ticketMachine.getTicket();
@@ -72,14 +87,17 @@ function Customer(name) {
         }
     }
     
+    //Does the customer have a ticket?
     this.hasTicket = function() {
         return this.ticket !== null;
     }   
     
+    //Exit the use of the ticketMachine
     this.exit = function() {
-        this.ticketMachine.exit();
+        this.ticketMachine.reset();
     }
     
+    //Update the Customer information visible on screen
     this.updateScreen = function() {
         if (this.hasTicket()) {
             $('customer-ticket').innerHTML = this.ticket.toString();
@@ -91,19 +109,25 @@ function Customer(name) {
 
 //Ticket machine class
 function TicketMachine() {
-    //The id's of the pages that can be shown on the ticket machine screen
+    //The id's of the pages that can be shown on the ticketMachine screen
     this.pages = ['start', 'attractions', 'confirm-ticket', 
                   'remove-ticket', 'show-ticket'];
-    //The attractions for which the ticket machine can book a ticket
+                  
+    //The attractions for which the ticketMachine can book you a ticket
     this.attractions = [new Attraction('Eclipse'),
                         new Attraction('Fritt fall'),
                         new Attraction('Insane'),
                         new Attraction('Jetline'),
                         new Attraction('Vilda musen')];
+                        
+    //A list of customers currently using the ticketMachine
     this.customers = new Array();
+    //Currently displayed page
     this.page = 'start';
+    //When the ticket machine books tickets it keeps it for itself until the end
     this.ticket = null;
-    
+
+    //Displays the names of current customers on screen in the html-element that has id='customers'
     this.showCustomers = function() {
         var e = $('customers');
         e.innerHTML = '';
@@ -113,6 +137,7 @@ function TicketMachine() {
         }
     }
     
+    //A customer can only be scanned once and only when the start page is visible
     this.scan = function(customer) {
         if (this.page !== 'start' || contains(this.customers, customer)) {
             return;
@@ -125,14 +150,14 @@ function TicketMachine() {
         }
     }
     
+    //Adds a customer to the list of customers currently using the machine
     this.addCustomer = function(customer) {
-        assertNotEquals(null, customer);
         this.customers.push(customer);
         this.showCustomers();
     }
     
+    //Removes a customer from the list of customers currently using the machine
     this.removeCustomer = function(customer) {
-        assertNotEquals(null, customer);
         //If ticket is booked, you can't remove yourself
         if (this.page === 'show-ticket') {
             return;
@@ -140,48 +165,52 @@ function TicketMachine() {
         this.customers = remove(this.customers, customer);
         this.showCustomers();
         if (this.customers.length === 0) {
-            this.exit();   
+            this.reset();   
         }
     }
     
+    //If a customer decides to cancel an unbook, he is removed and 
+    //the start page is shown
     this.cancelUnbook = function() {
         this.customers.pop();
         this.showStart();
     }
     
+    //A couple of 'show page' functions
     this.showStart = function() {
         this.showCustomers();
         this.show('start');
     }
     
     this.showAttractions = function() {
-        if (this.customers.length > 0) {
+        if (this.customers.length > 0) { //If no customer use the machine it won't proceed
             this.show('attractions');
         }
     }
     
+    //Creates the ticket that might be booked for display
     this.showConfirmPage = function(attraction) {
         this.ticket = new Ticket(ticketMachine.attractions[attraction]);
         this.show('confirm-ticket');
         $('confirm').innerHTML = 'Vill du boka ' + this.ticket.toString(this.customers.length) + '?';
     }
-    
+
     this.showTicket = function() {
         this.show('show-ticket');
-        $('show').innerHTML = 'Du har bokat ' + this.ticket.toString(this.customers.length);
+        $('show').innerHTML = 'Du har bokat ' + this.ticket.toString(this.customers.length) + '.';
     }
-
+    
     this.hasTicket = function() {
         return this.ticket !== null && this.page === 'show-ticket';
     }
     
+    //Gives away a ticket to all customers currently using the machine
+    //and then resets.
     this.getTicket = function() {
         for (i in this.customers) {
             this.customers[i].ticket = this.ticket;
         }
-        this.ticket = null;
-        this.customers = new Array();
-        this.showStart();
+        this.reset()
     }
     
     //Shows the page on it's screen
@@ -197,6 +226,7 @@ function TicketMachine() {
         }
     }
 
+    //Updates the attractions on screen since the queueing times changes
     this.updateAttractions = function() {
         var e = $('insert-attractions');
         e.innerHTML = '';
@@ -206,6 +236,7 @@ function TicketMachine() {
         }
     }
     
+    //Updates the clock on the ticketMachine screen 
     this.updateClock = function() {
         var date = new Date();
         $('clock').innerHTML = timePad(date.getHours()) + ':' + timePad(date.getMinutes());
@@ -223,7 +254,9 @@ function TicketMachine() {
         }
     }
 
-    this.exit = function() {
+    //Exits the ticketMachine
+    this.reset = function() {
+        this.ticket = null;
         this.customers = new Array();
         this.showStart();
     }
@@ -257,56 +290,18 @@ function Attraction(name) {
     this.toString = function() {
         return this.name + ' ' + this.queueTime + 'min';
     }
-    
-    
 }
-
-
-
-
 
 
 //--------------------------------------------------------------------------------
 
-
-
-
-//Some useful stuff
-function assertEquals(x, y) {
-    if (x !== y) {
-        var errorStack = (new Error).stack.split(":");
-        var line = errorStack[errorStack.length-1];
-        $('assert').innerHTML += '<p>Line  ' + line + ': ' + x + ' was not equal to ' + y + '</p>';
-    }
-}
-
-function assertNotEquals(x, y) {
-    if (x === y) {
-        var errorStack = (new Error).stack.split(":");
-        var line = errorStack[errorStack.length-1];
-        $('assert').innerHTML += '<p>Line  ' + line + ': ' + x + ' was not equal to ' + y + '</p>';
-    }
-}
-
-function test() {
-    t = new TicketMachine();
-    c1 = new Customer();
-    c2 = new Customer();
-    c1.useTicketMachine(t);
-    assertEquals(false, c1.hasTicket());
-
-    c1.selectAttraction(0);
-    c1.bookTicket();
-    assertEquals(true, c1.hasTicket());
-    c1.unbookTicket();
-    c1.assertEquals(false, c1.hasTicket());
-}
 
 //returns element by id
 function $(id) {
     return document.getElementById(id);
 }
 
+//pads time so that 1:1 -> 01:01
 function timePad(time) {
     return (time < 10) ? "0" + time : time;
 }
@@ -332,6 +327,7 @@ function contains(array, data) {
     return false;
 }
 
+//Selects a link from the navigation menu
 function selectLink(id) {
     $(id + '-link').className = 'selected';
 }
