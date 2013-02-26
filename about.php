@@ -13,7 +13,7 @@
     av fastpass-system som införts på olika platser i världen och kommer att bygga en egen
     variant för Gröna Lund.</p>
 </div>
-    
+
 <div id="main-right">
     <h1>Om oss</h1>
     <p>Vi är ett utspritt gäng från sektionerna datateknik, elektroteknik och 
