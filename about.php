@@ -5,7 +5,7 @@
     ett problem. Gröna Lund har ett kösystem som fungerar dåligt när antalet besökare är många.
     Kösystemet fungerar som så att man ställer sig sist i kön och står där tills man står längst
     fram i kön. Är kötiden +45min blir vistelsen olidlig.</p>
-        <img src="Images/gronalogo.jpg" width="500">
+        <img src="Images/gronalogo.jpg" width="500" alt="Picture of Gröna Lund">
 
     <h2>Ett nytt kösystem</h2>
     <p>Vi har beslutat oss för att undersöka möjligheten att utforma ett kösystem som klarar
