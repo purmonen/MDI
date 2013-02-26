@@ -31,16 +31,18 @@ li {
 }
 
 #header {
-    background-color: #c55;
+    background-color: white;
     text-align: center;
     margin: 0;
     padding: 0;
+    border-bottom: 3px solid #ccc;
 }
 
 #nav {
     height: 50px;
     width: 632px;
     margin: 0 auto;
+
 }
 
 #nav a {
@@ -48,7 +50,7 @@ li {
     text-align: center;
     width: 130px;
     display: block;
-    color: white;
+    color: #888;
     font-size: 1.3em;
     line-height: 50px;
     float: left;
@@ -57,10 +59,12 @@ li {
 }
 
 #nav a:active,
-#nav a:hover,
+#nav a:hover {
+    color: #d55;
+}
 #nav .selected {
     color: #d55;
-    background-color: white;
+    border-bottom: 3px solid #d55;
 }
 
 #content {
@@ -136,16 +140,11 @@ li {
 .customer {
     font-size: 0.7em;
     float: left;
-    background-color: #d55;
+    background-color: #aaa;
     padding: 8px;
     color: white;
     border-radius: 15px;
     margin-left: 5px;
-}
-
-.customer:hover,
-.customer:active {
-    box-shadow: 0 0 10px #bbb;
 }
 
 #customers-list {

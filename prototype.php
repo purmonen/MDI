@@ -17,35 +17,35 @@
 <div id="kiosk-screen">
     <p id="clock"></p>
     <div id="start" onclick="customer.start()">
-        <h1>Välkommen</h1>
-        <p>Scanna av ditt åkband med scannern nedanför och klicka på skärmen för att fortsätta.</p>
+        <h1 id="start-header"></h1>
+        <p id="start-text"></p>
         <p class="center"><img src="Images/arm.jpg" alt="Picture of how to scan" height="200"></p>
     </div>
     
     <div id="attractions">
-        <h1>Välj attraktion</h1>
+        <h1 id="attraction-header"></h1>
         <div id="insert-attractions"></div>
         <p class="button negative" onclick="customer.exit()"><span class="single">Avsluta</span></p>
     </div>
     
     <div id="confirm-ticket">
-        <h1>Verifiera</h1>
+        <h1 id="confirm-ticket-header"></h1>
         <p id="confirm"></p>
-        <p class="button" onclick="customer.bookTicket()"><span class="single">Ja</span></p>
-        <p class="button negative" onclick="customer.cancelBook()"><span class="single">Nej</span></p>       
+        <p id="confirm-yes" class="button" onclick="customer.bookTicket()"><span class="single">Ja</span></p>
+        <p id="confirm-no" class="button negative" onclick="customer.cancelBook()"><span class="single">Nej</span></p>       
     </div>
     
     <div id="show-ticket">
-        <h1>Biljetter</h1>
+        <h1 id="show-ticket-header"></h1>
         <p id="show"></p>
         <p>Använd biljettutaget.</p>
     </div>
     
     <div id="remove-ticket">
-        <h1>Avboka</h1>
+        <h1 id="remove-ticket-header"></h1>
         <p id="remove"></p>
-        <p class="button" onclick="customer.unbookTicket()"><span class="single">Ja</span></p>
-        <p class="button negative" onclick="customer.cancelUnbook()"><span class="single">Nej</span></p>
+        <p id="remove-no" class="button" onclick="customer.unbookTicket()"><span class="single">Ja</span></p>
+        <p id="remove-yes" class="button negative" onclick="customer.cancelUnbook()"><span class="single">Nej</span></p>
     </div>
     
     <div id="customers"></div> 

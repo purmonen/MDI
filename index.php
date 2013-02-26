@@ -18,23 +18,22 @@ $log->updateLog();
 
 //THIS IS WHERE IT BEGINS
 //get page request
+
+$pages = array('about', 'report', 'prototype');
+
 $page = 'about';
 if (isset($_GET['page'])) {
     $page = $_GET['page'];
 }
 
 //compose filename
-$file = $page . '.php';
+if (!in_array($page, $pages)) {
+    echo 'Burn in hell hacker!';
+    exit;
+}
 
-//top template
 require_once 'top.php';
-
-//load the requested page if it exists
-if (file_exists($file)) {
-    require_once $file;
-    echo "<script>selectLink('$page')</script>";
-} 
-
-//load bottom template
+require_once $page . '.php';
 require_once 'bottom.php';
+echo "<script>selectLink('$page')</script>"; 
 ?>
