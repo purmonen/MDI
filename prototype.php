@@ -38,7 +38,7 @@
     <div id="show-ticket">
         <h1 id="show-ticket-header"></h1>
         <p id="show"></p>
-        <p>Använd biljettutaget.</p>
+        <p>Använd biljettuttaget.</p>
     </div>
 
     <div id="remove-ticket">
