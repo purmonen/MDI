@@ -1,0 +1,24 @@
+#report-main {
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+#report-nav {
+    text-align: center;
+    color: #888;
+}
+
+#report-nav a {
+    color: #888;
+    margin-left: 10px;
+}
+
+#report-nav a:active,
+#report-nav a:hover {
+    color: #e74b4a;
+    text-decoration: none;
+}
+
+#report-nav .selected {
+    color: #e74b4a;
+}
