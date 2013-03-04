@@ -1,2 +1,0 @@
-On this site all traffic goes through the index.php file. It serves as a router,
-loading different php-files depending on the get-request.
