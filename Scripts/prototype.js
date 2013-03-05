@@ -319,7 +319,7 @@ function TicketMachine() {
 
 var englishDictionary = {
     'start-header': 'Welcome',
-    'start-text': 'Scan your band with the scanner below, and click on the screen to proceed.',
+    'start-text': 'Scan one or more bands with the scanner below, and click on the screen to proceed.',
     'attraction-header': 'Pick attraction',
     'ticket-text': 'one ticket to %1 valid from %2 to %3',
     'tickets-text': '%1 tickets to %2 valid from %3 to %4',
@@ -340,7 +340,7 @@ var englishDictionary = {
 
 var swedishDictionary = {
     'start-header': 'Välkommen',
-    'start-text': 'Scanna av ditt åkband med scannern nedanför och klicka på skärmen för att fortsätta.',
+    'start-text': 'Scanna av ett eller flera åkband med scannern nedanför och klicka på skärmen för att fortsätta.',
     'attraction-header': 'Välj attraktion',
     'confirm-ticket-header': 'Bekräfta',
     'ticket-text': 'en biljett till %1 giltig mellan %2 och %3',
