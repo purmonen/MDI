@@ -35,9 +35,9 @@ a:hover {
 
 #wrap {
     padding-bottom: 80px;
-    width: 1000px;
+    width: 1100px;
     overflow: hidden;
-    margin: 0 auto 90px;
+    margin: 0 auto;
     background-color: white;  
     box-shadow: 0 0 15px #888;
 }
@@ -54,9 +54,7 @@ a:hover {
     height: 50px;
     width: 632px;
     margin: 0 auto;
-
 }
-
 
 #nav a {
     height: 50px;
@@ -82,16 +80,17 @@ a:hover {
 }
 
 #content {
-    margin: 20px 30px 20px 40px;
+    margin: 20px 30px 20px 30px;
 }
 
 #main-left {
     width: 570px;
     float: left;
+    margin-left: 40px;
 }
 
 #main-right {
-    width: 310px;
+    width: 300px;
     margin-left: 50px;
     float: left;
 }

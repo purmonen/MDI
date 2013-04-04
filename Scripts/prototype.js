@@ -1,401 +1,683 @@
-"use strict";
+/*jslint browser:true */
 
-//This function is called when the protoype page is loaded.
-//It sets up the environment, creating a ticket machine and a group of customers.
-window.onload = function() {
+(function () {
+    'use strict';
 
-    window.ticketMachine = new TicketMachine();
-    ticketMachine.showStart();
-    ticketMachine.setLanguage('swedish');
+    var customers, customer, languages, ticketMachine;
 
-    window.customers = {
-        'Sami': new Customer('Sami'),
-        'Simon': new Customer('Simon'),
-        'Henri': new Customer('Henri'),
-        'Paul': new Customer('Paul'),
-        'Mattias': new Customer('Mattias'),
-        'Lukas': new Customer('Lukas')
+    //Handle languages
+    languages = {};
+
+    languages.english = {
+        'start-header': 'Welcome',
+        'start-text': 'Scan your wristband according to the image',
+        'attractions-header': 'Pick attraction',
+        'ticket-text': 'one ticket to %1 valid from %2 to %3',
+        'tickets-text': '%1 tickets to %2 valid from %3 to %4',
+        'confirm-ticket-header': 'Confirm',
+        'ask-book': 'Do you want to book',
+        'ask-unbook': 'Do you wish to unbook?',
+        'you-have-booked': 'You have booked',
+        'exit': 'Exit',
+        'show-ticket-header': 'Tickets',
+        'remove-ticket-header': 'Unbook',
+        'remove-yes': 'Yes',
+        'remove-no': 'No',
+        'confirm-yes': 'Yes',
+        'confirm-no': 'No',
+        'take-ticket': 'Use the ticket slot.',
+        'none': 'none',
+        'attractions-text': 'You may also scan in more persons',
+        'start-progress': '1. Scan wristband',
+        'attractions-progress': '2. Pick attractions',
+        'confirm-ticket-progress': '3. Book ticket',
+        'show-ticket-progress': '4. Take ticket',
+        'visitors': 'Number of persons: ',
+        'name': 'Name: ',
+        'time': 'Quetime: ',
+        'height': 'Min height: ',
+        'invalid-pass-header': 'Invalid',
+        'invalid-pass-text': 'This pass has expired. It was: ',
+        'valid-through': 'Valid until '
     };
 
-    window.customer = null;
-
-    //Loads the customers into the drop-down list
-    var e = $('customers-list');
-    for (var name in customers) {
-        customers[name].useTicketMachine(ticketMachine);
-        var option = document.createElement('option');
-        option.value = name;
-        option.textContent = name;
-        e.appendChild(option);
-    }
-    changeCustomer();
-    ticketMachine.updateAttractions();
-    ticketMachine.updateClock();
-
-	setInterval("ticketMachine.updateClock()", 1000);
-}
-
-//Change the current customer
-function changeCustomer() {
-    customer = window.customers[$('customers-list').value];
-    customer.updateScreen();
-}
-
-//Customer class - what you do when you click on something on the page
-//is calling methods from this class.
-function Customer(name) {
-    this.name = name;
-    this.ticket = null;
-    this.ticketMachine = null;
-
-    this.useTicketMachine = function(ticketMachine) {
-        this.ticketMachine = ticketMachine;
+    languages.swedish = {
+        'start-header': 'Välkommen',
+        'start-text': 'Scanna av ditt åkband enligt bilden',
+        'attractions-header': 'Välj attraktion',
+        'confirm-ticket-header': 'Bekräfta',
+        'ticket-text': 'en biljett till %1 giltig mellan %2 och %3',
+        'tickets-text': '%1 biljetter till %2 giltiga mellan %3 och %4',
+        'ask-book': 'Vill du boka',
+        'ask-unbook': 'Vill du avboka?',
+        'you-have-booked': 'Du har bokat',
+        'exit': 'Avsluta',
+        'show-ticket-header': 'Biljetter',
+        'remove-ticket-header': 'Avboka',
+        'remove-yes': 'Ja',
+        'remove-no': 'Nej',
+        'confirm-yes': 'Ja',
+        'confirm-no': 'Nej',
+        'take-ticket': 'Använd biljettuttaget.',
+        'none': 'ingen',
+        'attractions-text': 'Du kan också scanna in fler personer',
+        'start-progress': '1. Scanna åkband',
+        'attractions-progress': '2. Välj attraktion',
+        'confirm-ticket-progress': '3. Boka biljett',
+        'show-ticket-progress': '4. Hämta biljett',
+        'visitors': 'Antal personer: ',
+        'name': 'Namn: ',
+        'time': 'Kötid: ',
+        'height': 'Minlängd: ',
+        'invalid-pass-header': 'Ogiltig',
+        'invalid-pass-text': 'Det här åkbandet har gått ut. Den var: ',
+        'valid-through': 'Giltig t.o.m. '
     };
 
-    this.scan = function() {
-        this.ticketMachine.scan(this);
-    };
-    
-    this.setLanguage = function(language) {
-        if (this.ticket) {
-        	this.ticket.language = window.languages[language]
+    function updateCustomers() {
+        var name;
+        for (name in customers) {
+            if (customers.hasOwnProperty(name)) {
+                customers[name].updateTicket();
+            }
         }
-        this.ticketMachine.setLanguage(language);
-        this.updateScreen();
     }
 
+    //returns element by id
+    function $(id) {
+        return document.getElementById(id);
+    }
 
-    //Customer clicks on screen to start - ticketMachine shows attractions
-    this.start = function() {
-        this.ticketMachine.showAttractions();
-    };
+    // stringifies a number to two digits, with possible leading zero
+    function timePad(time) {
+        return (time < 10 ? "0" : "") + time;
+    }
 
-    //Customer clicks on an attraction - ticketMachine shows the confirm page
-    this.selectAttraction = function(attraction) {
-        this.ticketMachine.showConfirmPage(attraction);
-    };
+    //checks if array contains data
+    function contains(array, data) {
+        var i;
+        for (i = 0; i < array.length; i += 1) {
+            if (array[i] === data) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    //Customer decides to book a ticket - ticketMachine shows the ticket
-    this.bookTicket = function() {
-        this.ticketMachine.showTicket();
-    };
+    function removeClass(id, className) {
+        var e = $(id),
+            re = new RegExp('\\b' + className + '\\b');
+        e.className = e.className.replace(re, '').trim();
+    }
 
-    //Customer decides to cancel the book of a ticket
-    this.cancelBook = function() {
-        this.ticketMachine.showAttractions();
-    };
+    function Pass(expireDate) {
+        this.toString = function (language) {
+            if (language === 'undefined') {
+                language = languages.swedish;
+            }
+            return language['valid-through'] + 
+                timePad(expireDate.getMonth() + 1) + '-' +
+                timePad(expireDate.getDate()) + '-' +
+                expireDate.getFullYear() + ' ' +
+                timePad(expireDate.getHours()) + ':00';
+        };
 
-    //Customer decides to unbook a ticket - ticketMachine shows the start page
-    this.unbookTicket = function() {
-        this.ticketMachine.showStart();
+        this.hasExpired = function () {
+            if (expireDate.getTime() < new Date().getTime()) {
+                return true;
+            }
+            return false;
+        };
+    }
+
+    //Customer class - what you do when you click on something on the page
+    //is calling methods from this class.
+    function Customer(name, pass) {
+        this.name = name;
         this.ticket = null;
-        this.updateScreen();
-    };
+        this.pass = pass;
 
-    //Customer decides not to unbook - 
-    this.cancelUnbook = function() {
-        this.ticketMachine.cancelUnbook();
-    };
+        this.setStatus = function (status) {
+            var e = $(this.name + '-div');
+            if (status) {
+                e.className += ' ' + status;
+            } else {
+                e.className = 'customer-div';
+            }
+        };
 
-    //Customer takes the ticket from the machine which can only be done
-    //if the machine actually has one
-    this.getTicket = function() {
-        if (this.ticketMachine.hasTicket()) {
-            this.ticketMachine.getTicket();
-            this.updateScreen();
-        }
-    };
-
-    //Exit the use of the ticketMachine
-    this.exit = function() {
-        this.ticketMachine.reset();
-    };
-
-    //Update the Customer information visible on screen
-    this.updateScreen = function() {
-        $('customer-ticket').textContent = (this.ticket ? this.ticket.toString(1) : 'Ingen');
-    };
-}
-
-//Ticket machine class
-function TicketMachine() {
-    //The id's of the pages that can be shown on the ticket machine screen
-    this.pages = [
-        'start', 'attractions', 'confirm-ticket', 
-        'remove-ticket', 'show-ticket'
-    ];
-
-    //The attractions for which the ticket machine can book you a ticket
-    this.attractions = [
-        new Attraction('Eclipse'),
-        new Attraction('Fritt fall'),
-        new Attraction('Insane'),
-        new Attraction('Jetline'),
-        new Attraction('Vilda musen')
-    ];
-
-    //A list of customers currently using the ticket machine
-    this.customers = [];
-    //Currently displayed page
-    this.page = 'start';
-    //When the ticket machine books tickets it keeps it for itself until the end
-    this.ticket = null;
-    this.language = languages['swedish'];
-
-
-    //Displays the names of current customers on screen in the html-element that has id='customers'
-    this.showCustomers = function() {
-        var e = $('customers');
-        e.textContent = '';
-        this.customers.forEach(function(c) {
-            var p = document.createElement('p');
-            p.className = 'customer';
-            p.textContent = c.name;
-            e.appendChild(p);
-        });
-    };
-
-    //A customer can only be scanned once and only when the start page is visible
-    this.scan = function(customer) {
-        if (this.page !== 'start' || contains(this.customers, customer)) {
-            return;
-        }
-        this.addCustomer(customer);
-        if (customer.ticket) {
-            this.show('remove-ticket');
-            this.updateRemoveTicketText();
-        }
-    };
-    
-    this.updateRemoveTicketText = function() {
-        $('remove').textContent = this.language['ask-unbook'] + ' ' +
-                                   customer.ticket.toString(1) + '?';
+        //Update the Customer information visible on screen
+        this.updateTicket = function() {
+            $(this.name + '-customer-ticket').textContent = (this.ticket ?
+                    this.ticket.toString() : 'Ingen');
+        };
     }
 
-    //Adds a customer to the list of customers currently using the machine
-    this.addCustomer = function(customer) {
-        this.customers.push(customer);
-        this.showCustomers();
-    };
+    // Attraction class
+    function Attraction(name, height) {
+        this.name = name;
+        this.height = height;
+        //Generates a random queue time between 15 and 75
+        this.queueTime = Math.round(10 + Math.random() * 60);
 
-    //Removes a customer from the list of customers currently using the machine
-    this.removeCustomer = function(index) {
-        //If ticket is booked, you can't remove yourself
-        if (this.page === 'show-ticket') {
-            return;
-        }
-        this.customers.splice(index, 1);
-        this.showCustomers();
-        if (!this.customers.length) {
-            this.reset();   
-        }
-    };
+        this.formatName = function() {
+            return this.name.split(' ').join('').toLowerCase();
+        };
 
-    //If a customer decides to cancel an unbook, he is removed and 
-    //the start page is shown
-    this.cancelUnbook = function() {
-        this.customers.pop();
-        this.showStart();
-    };
-
-    //A couple of 'show page' functions
-    this.showStart = function() {
-        this.showCustomers();
-        this.show('start');
-    };
-
-    this.showAttractions = function() {
-        if (!this.customers.length) {
-            // If no customer uses the machine, don't proceed.
-            return;
-        }
-        this.show('attractions');
-    };
-
-    //Creates the ticket that might be booked for display
-    this.showConfirmPage = function(attraction) {
-        this.ticket = new Ticket(this.attractions[attraction], this.language);
-        this.show('confirm-ticket');
-        this.updateConfirmPage();
-    };
-    
-    this.updateConfirmPage = function() {
-        $('confirm').textContent = this.language['ask-book'] + ' ' + this.ticket.toString(this.customers.length) + '?';
+        this.toString = function() {
+            return this.name + '\n' + this.queueTime + 'min\n' + this.height + 'cm';
+        };
     }
 
-    this.showTicket = function() {
-        this.show('show-ticket');
-        $('show').textContent = 'Du har bokat ' + this.ticket.toString(this.customers.length) + '.';
-    };
-    
-    this.updateShowTicketPage = function() {
-		$('show').textContent = this.language['you-have-booked'] + ' ' + this.ticket.toString(this.customers.length);
-    };
-
-    this.hasTicket = function() {
-        return this.ticket !== null && this.page === 'show-ticket';
-    };
-
-    //Gives away a ticket to all customers currently using the machine
-    //and then resets.
-    this.getTicket = function() {
-        var self = this;
-        this.customers.forEach(function(c) {
-            c.ticket = self.ticket;
-        });
-        this.reset();
-    };
-
-    //Shows the page on it's screen
-    this.show = function(page) {
-        this.page = page;
-        this.pages.forEach(function(p) {
-            var e = $(p);
-            e.style.display = (p === page ? 'block' : 'none');
-        });
-    };
-
-    // Updates the attractions on screen since the queueing times changes
-    this.updateAttractions = function() {
-        var e = $('insert-attractions');
-        e.textContent = '';
-        var tm = this;
-        this.attractions.forEach(function(a, i) {
-            var p = document.createElement('p');
-            p.className = 'button';
-            p.onclick = function() { window.customer.selectAttraction(i); };
-            p.textContent = tm.attractions[i].toString()
-            e.appendChild(p);
-        });
-    };
-
-    // Updates the clock on the ticket machine screen 
-    this.updateClock = function() {
+    //Ticket class
+    function Ticket(attraction) {
         var date = new Date();
-        $('clock').textContent = timePad(date.getHours()) + ':' + timePad(date.getMinutes());
+        date.setMinutes(date.getMinutes() + attraction.queueTime);
+        this.startTime = timePad(date.getHours()) + ':' +
+            timePad(date.getMinutes());
+        this.endTime = timePad(date.getHours() + 1) + ':' +
+            timePad(date.getMinutes());
+        this.attraction = attraction;
 
-        // Update queue times
-        if (date.getSeconds() % 8 === 0) {   
-            this.attractions.forEach(function(a) {
-                if (Math.random() * 2 >= 1)
-                    ++a.queueTime;
-                if (a.queueTime > 0 && Math.random() * 2 >= 1)
-                    --a.queueTime;
-            });
-            this.updateAttractions();
-        }
-    };
-
-    //Exits the ticket machine
-    this.reset = function() {
-        this.ticket = null;
-        this.customers = new Array();
-        this.showStart();
-    };
-
-    this.setLanguage = function(language) {
-        this.language = languages[language];
-        var text = [
-            'start-header', 'start-text', 'attraction-header',
-            'confirm-ticket-header', 'show-ticket-header',
-            'remove-ticket-header', 'exit', 'remove-yes',
-            'remove-no', 'confirm-yes', 'confirm-no', 'take-ticket'
-        ];
-        
-        for (var i = 0; i < text.length; i++) {
-	        $(text[i]).textContent = this.language[text[i]];
-        }
-        
-        if (this.ticket) {
-            this.ticket.language = this.language;
-			this.updateConfirmPage();
-			this.updateShowTicketPage();
-        }
-        if (this.page === 'remove-ticket') {
-			this.updateRemoveTicketText();
-		}
-    };
-}
-
-var englishDictionary = {
-    'start-header': 'Welcome',
-    'start-text': 'Scan one or more bands with the scanner below, and click on the screen to proceed.',
-    'attraction-header': 'Pick attraction',
-    'ticket-text': 'one ticket to %1 valid from %2 to %3',
-    'tickets-text': '%1 tickets to %2 valid from %3 to %4',
-    'confirm-ticket-header': 'Confirm',
-    'ask-book': 'Do you want to book ',
-    'ask-unbook': 'You have already booked one ticket. Do you wish to unbook:',
-    'you-have-booked': 'You have booked',
-    'exit': 'Exit',
-    'show-ticket-header': 'Tickets',
-    'remove-ticket-header': 'Unbook',
-    'remove-yes': 'Yes',
-    'remove-no': 'No',
-    'confirm-yes': 'Yes',
-    'confirm-no': 'No',
-    'take-ticket': 'Take your tickets.',
-    'none': 'none'
-};
-
-var swedishDictionary = {
-    'start-header': 'Välkommen',
-    'start-text': 'Scanna av ett eller flera åkband med scannern nedanför och klicka på skärmen för att fortsätta.',
-    'attraction-header': 'Välj attraktion',
-    'confirm-ticket-header': 'Bekräfta',
-    'ticket-text': 'en biljett till %1 giltig mellan %2 och %3',
-    'tickets-text': '%1 biljetter till %2 giltiga mellan %3 och %4',
-    'ask-book': 'Vill du boka ',
-    'ask-unbook': 'Du har redan bokat en biljett. Vill du avboka:',
-    'you-have-booked': 'Du har bokat',
-    'exit': 'Avsluta',
-    'show-ticket-header': 'Biljetter',
-    'remove-ticket-header': 'Avboka',
-    'remove-yes': 'Ja',
-    'remove-no': 'Nej',
-    'confirm-yes': 'Ja',
-    'confirm-no': 'Nej',
-    'take-ticket': 'Ta dina biljetter.',
-    'none': 'ingen'
-};
-
-//Handle languages
-window.languages = {
-    'english': englishDictionary,
-    'swedish': swedishDictionary
-};
-
-//Ticket class
-function Ticket(attraction, language) {
-    this.attraction = attraction;
-    var date = new Date();
-    date.setMinutes(date.getMinutes() + attraction.queueTime);
-    this.startTime = timePad(date.getHours()) + ':' + timePad(date.getMinutes());
-    this.endTime = timePad(date.getHours() + 1) + ':' + timePad(date.getMinutes());
-    this.language = language;
-    
-    this.toString = function(num) {
-        if (num > 1) {
-            return this.language['tickets-text'].
-            replace('%1', num).
-            replace('%2', this.attraction.name).
-            replace('%3', this.startTime).
-            replace('%4', this.endTime);
-        }
-        return this.language['ticket-text'].
-        replace('%1', this.attraction.name).
-        replace('%2', this.startTime).
-        replace('%3', this.endTime);
-    };
-}
-
-//Attraction class
-function Attraction(name) {
-    this.name = name;
-    //Generates a random queue time between 15 and 75
-    this.queueTime = Math.round(15 + Math.random() * 60);
-
-    this.toString = function() {
-        return this.name + ' ' + this.queueTime + 'min';
+        this.toString = function(language, num) {
+            if (typeof language === 'undefined') {
+                language = languages.swedish;
+            }
+            if (typeof num === 'undefined') {
+                num = 1;
+            }
+            if (num === 1) {
+                return language['ticket-text'].
+                    replace('%1', this.attraction.name).
+                    replace('%2', this.startTime).
+                    replace('%3', this.endTime);
+            }
+            return language['tickets-text'].
+                replace('%1', num).
+                replace('%2', this.attraction.name).
+                replace('%3', this.startTime).
+                replace('%4', this.endTime);
+        };
     }
-}
+
+    //Change the current customer
+    function changeCustomer(selectedName) {
+        if (customer) {
+            removeClass(customer.name + '-div', 'selected');
+        }
+        customer = customers[selectedName];
+        customer.setStatus('selected');
+
+    }
+
+    function createCustomers() {
+        var name, target, div, p, span, select, validDate;
+
+        validDate = new Date();
+        validDate.setHours(validDate.getHours() + 24);
+        customers = {
+            'Sami': new Customer('Sami', new Pass(validDate)),
+            'Simon': new Customer('Simon', new Pass(validDate)),
+            'Henri': new Customer('Henri', new Pass(validDate)),
+            'Paul': new Customer('Paul', new Pass(validDate)),
+            'Mattias': new Customer('Mattias', new Pass(validDate)),
+            'Lukas': new Customer('Lukas', new Pass(new Date()))
+        };
+
+        select = function () {
+            var index = name;
+            return function () {
+                changeCustomer(index);
+            };
+        };
+
+        target = $('prototype-left');
+        for (name in customers) {
+            if (customers.hasOwnProperty(name)) {
+                div = document.createElement('div');
+                div.onclick = select();
+                div.id = name + '-div';
+                div.className = 'customer-div';
+                p = document.createElement('p');
+                span = document.createElement('span');
+                span.className = 'attribute';
+                span.textContent = 'Namn: ';
+                p.appendChild(span);
+                span = document.createElement('span');
+                span.className = 'customer-name';
+                span.textContent = name;
+                p.appendChild(span);
+                div.appendChild(p);
+                p = document.createElement('p');
+                span = document.createElement('span');
+                span.className = 'attribute';
+                span.textContent = 'Fastpass: ';
+                p.appendChild(span);
+                span = document.createElement('span');
+                span.textContent = customers[name].pass.hasExpired() ? 
+                    'ogiltig' : 'giltig';
+                p.appendChild(span);
+                div.appendChild(p);
+                p = document.createElement('p');
+                span = document.createElement('span');
+                span.className = 'attribute';
+                span.textContent = 'Biljett: ';
+                p.appendChild(span);
+                span = document.createElement('span');
+                span.id = name + '-customer-ticket';
+                span.textContent = 'Ingen';
+                p.appendChild(span);
+                div.appendChild(p);
+                target.appendChild(div);
+            }
+        }
+    }
+
+    //Ticket machine class
+    function TicketMachine() {
+        var that = this,
+            page = 'start',
+            customers = [],
+            attractions = [
+                new Attraction('Fritt fall', 140),
+                new Attraction('Insane', 140),
+                new Attraction('Jetline', 140),
+                new Attraction('Katapulten', 140),
+                new Attraction('Eclipse', 120),
+                new Attraction('Vilda musen', 120),
+                new Attraction('Lyktan', 100),
+                new Attraction('Tuff tuff', 0)
+            ],
+            ticket = null,
+            language = languages.swedish;
+
+        function createImage(id, attraction) {
+            $(id).style.backgroundImage = 'url(/Images/' + attraction + '.jpg)';
+        }
+
+        function updateConfirmPage() {
+            var attraction = ticket.attraction;
+
+            $('attraction-name').textContent = language.name;
+            $('attraction-time').textContent = language.time;
+            $('attraction-height').textContent = language.height;
+
+            $('attraction-name-value').textContent = attraction.name;
+            $('attraction-time-value').textContent = attraction.queueTime + 'min';
+            $('attraction-height-value').textContent = attraction.height + 'cm';
+
+            $('confirm').textContent = 
+                language['ask-book'] + ' ' +
+                ticket.toString(language, customers.length) + '?';
+        }
+
+        function updateShowTicketPage() {
+            $('show').textContent = language['you-have-booked'] + ' ' +
+                                    ticket.toString(language, customers.length);
+        }
+
+        //Shows the page on it's screen
+        function show(p) {
+            if (page === 'remove-ticket' || page === 'invalid-pass') {
+                $('start-progress').className = 'progress';
+            } else {
+                $(page + '-progress').className = 'progress';
+            }
+            if (p === 'remove-ticket' || p === 'invalid-pass') {
+                $('start-progress').className = 'progress selected';
+            } else {
+                $(p + '-progress').className = 'progress selected';
+            }
+
+            $(page).style.display = 'none';
+            $(p).style.display = 'block';
+            page = p;
+        }
+
+        // Updates the attractions on screen since the queueing times changes
+        function createAttractions() {
+            var e, button, text, name, time, height, image, split, info;
+            e = $('insert-attractions');
+            e.textContent = '';
+            attractions.forEach(function(a, i) {
+                button = document.createElement('div');
+                button.id = a.formatName() + '-div';
+                button.className = 'image-button';
+                text = document.createElement('div');
+                text.className = 'attraction-text';
+                name = document.createElement('p');
+                time = document.createElement('p');
+                height = document.createElement('p');
+                name.textContent = a.name;
+                name.className = 'attraction-name';
+                time.textContent = a.queueTime + 'min';
+                height.textContent = a.height + 'cm';
+                text.appendChild(name);
+                text.appendChild(time);
+                text.appendChild(height);
+                time.id = a.formatName() + '-time';
+                button.appendChild(text);
+                image = document.createElement('div');
+                image.className = 'attraction-image';
+                image.style.backgroundImage = 'url("/Images/' + 
+                    a.formatName() + '.jpg")';
+                button.appendChild(image);
+                button.onclick = function() { that.showConfirmPage(i); };
+                e.appendChild(button);
+            });
+        }
+
+        function updateAttractions() {
+            attractions.forEach(function(a) {
+                if (Math.random() * 2 >= 1) {
+                    a.queueTime += 1;
+                }
+                if (a.queueTime > 0 && Math.random() * 2 >= 1) {
+                    a.queueTime -= 1;
+                }
+                var div = $(a.formatName() + '-div');
+                if (a.queueTime < 20) {
+                    div.style.backgroundColor = '#0f0';
+                } else if (a.queueTime < 40) {
+                    div.style.backgroundColor = '#ff0';
+                } else {
+                    div.style.backgroundColor = 'orange';
+                }
+                $(a.formatName() + '-time').textContent = a.queueTime + 'min';
+            });
+        }
+
+        // Updates the clock on the ticket machine screen 
+        function updateClock() {
+            var date = new Date();
+            $('clock').textContent = timePad(date.getHours()) + ':' + 
+                timePad(date.getMinutes());
+            if (date.getSeconds() % 8 === 0) {
+                updateAttractions();
+            }
+        }
+
+        function updateInvalidPassPage() {
+            var pass = customers[customers.length - 1].pass;
+            $('invalid-pass-text').textContent =
+                language['invalid-pass-text'] + pass.toString(language);
+        }
+
+        function updateRemoveTicketText() {
+            $('remove').textContent =
+                language['you-have-booked'] + ': ' +
+                customer.ticket.toString(language) + '. ' +
+                language['ask-unbook'];
+        }
+
+        function updateAttractionsPage() {
+            $('attractions-text').textContent =
+                language.visitors + customers.length.toString() + '. ' +
+                language['attractions-text'];
+        }
+
+        this.showTicket = function() {
+            show('show-ticket');
+            updateShowTicketPage();
+        };
+
+        //Gives away a ticket to all customers currently using the machine
+        //and then resets.
+        this.getTicket = function() {
+            if (page !== 'show-ticket') {
+                return;
+            }
+            customers.forEach(function(c) {
+                c.ticket = ticket;
+                c.updateTicket();
+            });
+            this.reset();
+        };
+
+        //A customer can only be scanned once and only when the start page is visible
+        this.scan = function(customer) {
+            if ((page !== 'start' && page !== 'attractions') ||
+                    contains(customers, customer)) {
+                return;
+            }
+            customers.push(customer);
+            if (customer.pass.hasExpired()) {
+                this.showInvalidPass();
+                return;
+            }
+            if (customer.ticket) {
+                this.showRemoveTicket();
+                updateRemoveTicketText();
+            } else if (customers.length > 0) {
+                customer.setStatus('scanned');
+                this.showAttractions();
+            }
+        };
+
+        this.showInvalidPass = function () {
+            updateInvalidPassPage();
+            show('invalid-pass');
+            setTimeout(function() {
+                customers.pop();
+                if (customers.length > 0) {
+                    that.showAttractions();
+                } else {
+                    that.showStart();
+                }
+            }, 4000);
+        };
+
+        this.unbookTicket = function() {
+            var customer = customers[customers.length - 1];
+            customer.ticket = null;
+            customer.setStatus('scanned');
+            customer.updateTicket();
+            this.showAttractions();
+        };
+
+        this.showRemoveTicket = function() {
+            show('remove-ticket');
+            createImage('remove-image',
+                customers[customers.length - 1].ticket.attraction.formatName());
+        };
+
+        //If a customer decides to cancel an unbook, he is removed and 
+        //the start page is shown
+        this.cancelUnbook = function() {
+            customers.pop();
+            if (customers.length > 0) {
+                this.showAttractions();
+            } else {
+                this.showStart();
+            }
+        };
+
+        //A couple of 'show page' functions
+        this.showStart = function() {
+            show('start');
+        };
+
+        this.showAttractions = function() {
+            if (!customers.length) {
+                // If no customer uses the machine, don't proceed.
+                return;
+            }
+            updateAttractionsPage();
+            show('attractions');
+        };
+
+        //Creates the ticket that might be booked for display
+        this.showConfirmPage = function(attraction) {
+            attraction = attractions[attraction];
+            ticket = new Ticket(attraction, language);
+            createImage('confirm-image', attraction.formatName());
+            show('confirm-ticket');
+            updateConfirmPage(attraction);
+        };
+
+
+        //Exits the ticket machine
+        this.reset = function () {
+            customers.forEach(function (c) {
+                removeClass(c.name + '-div', 'scanned');
+            });
+            ticket = null;
+            customers = [];
+            that.showStart();
+            that.setLanguage('swedish');
+        };
+
+        this.setLanguage = function(l) {
+            var text, i;
+
+            language = languages[l];
+            text = [
+                'start-header', 'start-text', 'attractions-header',
+                'confirm-ticket-header', 'show-ticket-header',
+                'remove-ticket-header', 'exit', 'remove-yes',
+                'remove-no', 'confirm-yes', 'confirm-no', 'take-ticket',
+                'start-progress', 'attractions-progress',
+                'confirm-ticket-progress', 'show-ticket-progress',
+                'invalid-pass-header', 'invalid-pass-text'
+            ];
+
+            for (i = 0; i < text.length; i += 1) {
+                $(text[i]).textContent = language[text[i]];
+            }
+            updateAttractionsPage();
+            if (page === 'invalid-pass') {
+                updateInvalidPassPage();
+            }
+            if (ticket) {
+                updateConfirmPage();
+                updateShowTicketPage();
+            }
+            if (page === 'remove-ticket') {
+                updateRemoveTicketText();
+            }
+        };
+
+        (function init() {
+            that.showStart();
+            that.setLanguage('swedish');
+            createAttractions();
+            updateAttractions();
+            updateClock();
+            setInterval(function () {
+                updateClock();
+            }, 1000);
+        }());
+    }
+
+    function addEvents() {
+        $('kiosk-scan').onclick = function () {
+            ticketMachine.scan(customer);
+        };
+        $('kiosk-ticket').onclick = function () {
+            ticketMachine.getTicket();
+        };
+        $('swedish-flag').onclick = function () {
+            ticketMachine.setLanguage('swedish');
+        };
+        $('english-flag').onclick = function () {
+            ticketMachine.setLanguage('english');
+        };
+        $('remove-no').onclick = function () {
+            ticketMachine.cancelUnbook();
+        };
+        $('remove-yes').onclick = function () {
+            ticketMachine.unbookTicket();
+        };
+        $('confirm-no').onclick = function () {
+            ticketMachine.showAttractions();
+        };
+        $('confirm-yes').onclick = function () {
+            ticketMachine.showTicket();
+        };
+        $('exit').onclick = function () {
+            ticketMachine.reset();
+        };
+    }
+    
+    function test() {
+        var ticket;
+        assertEquals(customer.ticket, null);
+        
+        assertEquals($(customer.name + '-div').className, 
+            'customer-div selected');
+        
+        //Scan and exit
+        ticketMachine.scan(customer);
+        assertEquals($(customer.name + '-div').className,
+            'customer-div selected scanned');
+        ticketMachine.reset();
+        assertEquals($(customer.name + '-div').className,
+            'customer-div selected');
+        assertEquals(customer.ticket, null);
+
+        //Book a single ticket
+        ticketMachine.scan(customer);
+        assertEquals($(customer.name + '-div').className,
+           'customer-div selected scanned');
+        ticketMachine.showConfirmPage(0);
+        ticketMachine.showTicket();
+        ticketMachine.getTicket();
+        assertEquals($(customer.name + '-div').className,
+            'customer-div selected');
+        assertEquals(customer.ticket.constructor, Ticket);
+        
+        //Decide not to unbook
+        ticket = customer.ticket;
+        ticketMachine.scan(customer);
+        ticketMachine.cancelUnbook();
+        assertEquals(customer.ticket, ticket);
+        
+        //Decide to unbook
+        ticket = customer.ticket;
+        ticketMachine.scan(customer);
+        ticketMachine.unbookTicket();
+        ticketMachine.reset();
+        assertEquals(customer.ticket, null);
+        
+        //Book multiple tickets
+        ticketMachine.scan(customer);
+        changeCustomer('Simon');
+        assertEquals($(customer.name + '-div').className,
+            'customer-div selected');
+        assertEquals(customer.ticket, null);
+        ticketMachine.scan(customer);
+        assertEquals($(customer.name + '-div').className,
+           'customer-div selected scanned');
+        ticketMachine.showConfirmPage(0);
+        ticketMachine.showTicket();
+        ticketMachine.getTicket();
+        ticket = customer.ticket;
+        assertEquals(ticket.constructor, Ticket);
+        changeCustomer('Sami');
+        assertEquals(customer.ticket, ticket);
+    }
+    
+    function assertEquals(a, b) {
+        var stack, lines, i, line;
+        if (a !== b) {
+            stack = new Error().stack.split(/\n/g);
+            lines = ''
+            for (i = 0; i < stack.length; i++) {
+                line = stack[i].split(/:/g);
+                lines += line[line.length - 1] + ', ';
+            }
+            console.log('Test failed at lines ' + lines + '' +
+                a + ' was not equal to ' + b + '.');
+        }
+        return a === b;
+    }
+
+    //This function is called when the protoype page is loaded.
+    //It sets up the environment, creating a ticket machine and a group of customers.
+    window.onload = function() {
+        ticketMachine = new TicketMachine();
+        createCustomers();
+        changeCustomer('Sami');
+        addEvents();
+    };
+}());

@@ -1,5 +1,160 @@
+#prototype-description h2 {
+    margin-top: 30px;
+}
+
+#prototype-description {
+    clear: both;
+}
+
+#prototype-introduction {
+    margin-bottom: 30px;
+}
+
+.progress-step {
+
+}
+
+.text-center {
+    width: 800px;
+}
+
+#prototype-wrap {
+    width: 1100px;
+    padding-bottom: 80px;
+    overflow: hidden;
+    margin: 0 auto;
+    background-color: white;  
+    box-shadow: 0 0 15px #888;
+}
+
+#invalid-pass-text {
+    font-size: 1.3em;
+    line-height: 130%;
+    width: 500px;
+    margin-bottom: 20px;
+}
+
+#error-image {
+    margin: 0 auto;
+    display: block;
+}
+
+#confirm-wrap {
+    margin: 0 auto;
+    height: 230px;
+    width: 590px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+p#remove,
+div p#show,
+div p#take-ticket {
+    line-height: 130%;
+    font-size: 1.1em;
+}
+
+div p#take-ticket,
+div p#show {
+    font-size: 1.2em;
+}
+
+#confirm-info {
+    margin-left: 10px;
+    float: left;
+}
+
+#confirm-info p {
+    margin-top: 25px;
+}
+
+#confirm {
+    text-align: center;
+}
+
+#confirm-image {
+    float: left;
+    margin-bottom: 10px;
+}
+
+
+.attraction-text p {
+    margin: 0;    
+}
+
+p.attraction-name {
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+#exit {
+    position: absolute;
+    bottom: 0;
+    width: 140px;
+}
+
+.progress {
+    float: left;
+    margin-left: 3px;
+    padding: 3px 7px;
+    border: 1px solid white;
+}
+
+.progress.selected {
+    border: 1px solid #d0d0d0;
+    border-radius: 10px;
+    background-color: #afa;
+}
+
+#kiosk-screen #progress {
+    display: block;
+    margin: -10px auto 65px;
+    width: 520px;
+}
+
+#start {
+    text-align: center;
+}
+
+
+#start #start-header {
+    margin-bottom: 30px;
+}
+
+#start #start-text {
+    font-size: 1.3em;
+}
+
+.customer-div {
+    border: 1px solid #d0d0d0;
+    border-radius: 15px;
+    padding: 5px 10px;
+    margin-top: 10px;
+    font-size: 85%;
+    width: 380px;
+}
+
+.customer-div p {
+    margin: 0px;
+}
+
+.customer-div:hover {
+    cursor: pointer;
+}
+
+.customer-div.selected {
+    box-shadow: 0 0 5px #555;
+}
+
+.customer-div.scanned {
+    background-color: #ffa;
+}
+
 #prototype-left {
-    width: 430px;
+    width: 415px;
+    height: 650px;
     float: left;
 }
 
@@ -10,29 +165,31 @@
 }
 
 #kiosk {
-    height: 560px;
-    width: 450px;
+    height: 600px;
+    width: 600px;
     margin: 0 auto;
-    background-color: #5b5;
+    background-color: #bbb;
     border-radius: 30px;
 }
 
 #kiosk-screen {
-    font-size: 1.3em;
+    font-size: 95%;
     position: relative;
-    padding-left: 15px;
-    padding-right: 15px;
-    width: 390px;
-    height: 440px;
+    padding-left: 7px;
+    padding-right: 7px;
+    width: 566px;
+    height: 490px;
     margin: 0 auto;
     background-color: white;
-    border: 15px solid #5b5;
+    border: 10px solid #bbb;
     border-radius: 30px 30px 0 0;
 }
 
 #kiosk-screen h1 {
+    clear: both;
+    font-size: 3.2em;
     text-align: center;
-    margin-top: 55px;
+    margin-bottom: 20px;
 }
 
 #kiosk-screen:hover {
@@ -46,30 +203,33 @@
 #kiosk-screen #customers {
     display: block;
     position: absolute;
-    bottom: 0;
+    bottom: 0px;
+    left: 10px;
 }
 
 #kiosk-screen #languages {
     display: block;
     position: absolute;
-    top: 5px;
-    left: 10px;
+    bottom: 5px;
+    right: 10px;
 }
 
 .customer {
     font-size: 0.7em;
     float: left;
-    background-color: #999;
-    padding: 8px;
-    color: white;
+    padding: 6px 8px;
+    border: 1px solid #999;
+    background-color: #afa;
     border-radius: 15px;
     margin-left: 5px;
+    margin-bottom: 6px;
 }
 
 #customers-list {
     font-size: 0.7em;
     padding: 5px;
     margin-left: 5px;
+    overflow: none;
 }
 
 #kiosk-scan {
@@ -99,10 +259,10 @@
 }
 
 #clock {
-    font-size: 0.8em;
+    font-size: 1.2em;
     position: absolute;
-    top: -13px;
-    right: 18px;
+    top: 40px;
+    right: 35px;
 }
 
 #scanner,
@@ -117,22 +277,41 @@
     color: #b55;
 }
 
-.button {
-    width: 135px;
-    height: 38px;
-    margin: 10px;
-    padding: 10px 20px 25px;
-    color: white;
-    background-color: #5b5;
-    border-radius: 20px;
-    text-align: center;
-    float: left;
+#confirm-yes,
+#remove-yes,
+#confirm-no,
+#remove-no {
+    height: 65px;
+    line-height: 65px;
+}
+
+div.center {
+    margin: 0 auto;
+    width: 380px;
+    text-align: left;
 }
 
 .button:active,
 .button:hover {
-    background-color: #5c5;
-    box-shadow: 0 0 10px #bbb;
+    box-shadow: 0 0 15px #555;
+}
+
+.yes-no-div {
+    margin: 0 auto;
+    width: 360px;
+}
+
+.yes-no-div > p,
+#exit {
+    font-size: 120%;
+    width: 160px;
+    height: 65px;
+    line-height: 65px;
+    margin: 10px;
+    color: white;
+    border-radius: 20px;
+    text-align: center;
+    float: left;
 }
 
 .negative {
@@ -144,7 +323,64 @@
     background-color: #e55;
 }
 
-.single {   
-    display: block;
-    margin-top: 10px;
+.positive {
+    background-color: #5b5;
+}
+
+.positive:active,
+.positive:hover {
+    background-color: #5c5;
+}
+
+#confirm-image,
+#remove-image {
+    text-align: center;
+    margin: 0;
+    width: 400px;
+    height: 215px;
+    background-size: 350px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#confirm,
+#remove {
+    margin-bottom: 5px;
+}
+
+.image-button {
+    float: left;
+    margin: 4px;
+    border-radius: 10px;
+}
+
+.image-button:hover {
+    box-shadow: 0 0 15px #555;
+}
+
+.attraction-text {
+    width: 88px;
+    height: 80px;
+    border: 1px solid #333;
+    float: left;
+    border-radius: 10px 0 0 10px;
+    font-size: 85%;
+    color: black;
+    text-align: center;
+}
+
+.attraction-image {
+    background-size: 130px;
+    background-repeat: no-repeat;
+    width: 88px;
+    height: 80px;
+    border: 1px solid #333;
+    border-left-width: 0;
+    border-radius: 0 10px 10px 0;
+    color: white;
+    float: left;
+}
+
+#attractions-text {
+    text-align: center;
 }
