@@ -3,10 +3,10 @@
 <head>
     <title>MDI</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="/Stylesheets/style.css">
-    <link rel="stylesheet" type="text/css" href="/Stylesheets/prototype.css">
-    <script src="/Scripts/scripts.js"></script>
-    <script src="/Scripts/prototype.js?version=1.0"></script>
+    <link rel="stylesheet" type="text/css" href="Stylesheets/style.css">
+    <link rel="stylesheet" type="text/css" href="Stylesheets/prototype.css">
+    <script src="Scripts/scripts.js"></script>
+    <script src="Scripts/prototype.js?version=1.0"></script>
 </head>
 <body>
 <div id="prototype-wrap">

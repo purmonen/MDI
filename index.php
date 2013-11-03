@@ -3,8 +3,8 @@
 <head>
     <title>MDI</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="/Stylesheets/style.css">
-    <script src="/Scripts/scripts.js"></script>
+    <link rel="stylesheet" type="text/css" href="Stylesheets/style.css">
+    <script src="Scripts/scripts.js"></script>
 </head>
 <body>
 <div id="wrap">
@@ -18,7 +18,7 @@
     ett problem. Gröna Lund har ett kösystem som fungerar dåligt när antalet besökare är många.
     Kösystemet fungerar som så att man ställer sig sist i kön och står där tills man står längst
     fram i kön. Är kötiden +45min blir vistelsen olidlig.</p>
-    <img src="/Images/gronalogo.jpg" width="550" alt="Picture of Gröna Lund">
+    <img src="Images/gronalogo.jpg" width="550" alt="Picture of Gröna Lund">
 
     <h2>Ett nytt kösystem</h2>
     <p>Vi har beslutat oss för att undersöka möjligheten att utforma ett kösystem som klarar
@@ -34,7 +34,7 @@
     inom Människa-datorinteraktion</p>
     <h2>Medlemmar</h2>
     <ul id="members">
-        <li><a href="http://www.nada.kth.se/~purmonen" title="Homepage" target="_blank">Sami Purmonen</a></li>
+        <li><a href="http://www.nada.kth.se/~purmonen/" title="Homepage" target="_blank">Sami Purmonen</a></li>
         <li>Simon Lindholm</li>
         <li>Paul Griffin</li>
         <li>Mattias Harryson</li>

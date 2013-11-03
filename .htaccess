@@ -1,7 +1,0 @@
-RewriteEngine On
-
-RewriteRule ^(\w+((/\w+)+)?)/?$ $1.php
-
-RewriteCond %{HTTP_HOST} ^instance.se$
-RewriteRule ^/?$ "http\:\/\/www\.instance\.se\/" [R=301,L]
-

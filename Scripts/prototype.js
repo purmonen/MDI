@@ -292,7 +292,7 @@
             language = languages.swedish;
 
         function createImage(id, attraction) {
-            $(id).style.backgroundImage = 'url(/Images/' + attraction + '.jpg)';
+            $(id).style.backgroundImage = 'url(Images/' + attraction + '.jpg)';
         }
 
         function updateConfirmPage() {
@@ -359,7 +359,7 @@
                 button.appendChild(text);
                 image = document.createElement('div');
                 image.className = 'attraction-image';
-                image.style.backgroundImage = 'url("/Images/' + 
+                image.style.backgroundImage = 'url("Images/' + 
                     a.formatName() + '.jpg")';
                 button.appendChild(image);
                 button.onclick = function() { that.showConfirmPage(i); };

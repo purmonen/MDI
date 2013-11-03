@@ -3,9 +3,9 @@
 <head>
     <title>MDI</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="/Stylesheets/style.css">
-    <link rel="stylesheet" type="text/css" href="/Stylesheets/report.css">
-    <script src="/Scripts/scripts.js"></script>
+    <link rel="stylesheet" type="text/css" href="Stylesheets/style.css">
+    <link rel="stylesheet" type="text/css" href="Stylesheets/report.css">
+    <script src="Scripts/scripts.js"></script>
 </head>
 <body>
 <div id="wrap">
