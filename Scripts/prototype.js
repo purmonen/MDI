@@ -115,7 +115,7 @@
             if (language === 'undefined') {
                 language = languages.swedish;
             }
-            return language['valid-through'] + 
+            return language['valid-through'] +
                 timePad(expireDate.getMonth() + 1) + '-' +
                 timePad(expireDate.getDate()) + '-' +
                 expireDate.getFullYear() + ' ' +
@@ -221,7 +221,7 @@
             'Henri': new Customer('Henri', new Pass(validDate)),
             'Paul': new Customer('Paul', new Pass(validDate)),
             'Mattias': new Customer('Mattias', new Pass(validDate)),
-            'Lukas': new Customer('Lukas', new Pass(new Date()))
+            'Lukas': new Customer('Lukas', new Pass(new Date(new Date().getTime() - 1000)))
         };
 
         select = function () {
@@ -254,7 +254,7 @@
                 span.textContent = 'Fastpass: ';
                 p.appendChild(span);
                 span = document.createElement('span');
-                span.textContent = customers[name].pass.hasExpired() ? 
+                span.textContent = customers[name].pass.hasExpired() ?
                     'ogiltig' : 'giltig';
                 p.appendChild(span);
                 div.appendChild(p);
@@ -306,7 +306,7 @@
             $('attraction-time-value').textContent = attraction.queueTime + 'min';
             $('attraction-height-value').textContent = attraction.height + 'cm';
 
-            $('confirm').textContent = 
+            $('confirm').textContent =
                 language['ask-book'] + ' ' +
                 ticket.toString(language, customers.length) + '?';
         }
@@ -359,7 +359,7 @@
                 button.appendChild(text);
                 image = document.createElement('div');
                 image.className = 'attraction-image';
-                image.style.backgroundImage = 'url("Images/' + 
+                image.style.backgroundImage = 'url("Images/' +
                     a.formatName() + '.jpg")';
                 button.appendChild(image);
                 button.onclick = function() { that.showConfirmPage(i); };
@@ -387,10 +387,10 @@
             });
         }
 
-        // Updates the clock on the ticket machine screen 
+        // Updates the clock on the ticket machine screen
         function updateClock() {
             var date = new Date();
-            $('clock').textContent = timePad(date.getHours()) + ':' + 
+            $('clock').textContent = timePad(date.getHours()) + ':' +
                 timePad(date.getMinutes());
             if (date.getSeconds() % 8 === 0) {
                 updateAttractions();
@@ -481,7 +481,7 @@
                 customers[customers.length - 1].ticket.attraction.formatName());
         };
 
-        //If a customer decides to cancel an unbook, he is removed and 
+        //If a customer decides to cancel an unbook, he is removed and
         //the start page is shown
         this.cancelUnbook = function() {
             customers.pop();
@@ -598,14 +598,14 @@
             ticketMachine.reset();
         };
     }
-    
+
     function test() {
         var ticket;
         assertEquals(customer.ticket, null);
-        
-        assertEquals($(customer.name + '-div').className, 
+
+        assertEquals($(customer.name + '-div').className,
             'customer-div selected');
-        
+
         //Scan and exit
         ticketMachine.scan(customer);
         assertEquals($(customer.name + '-div').className,
@@ -625,20 +625,20 @@
         assertEquals($(customer.name + '-div').className,
             'customer-div selected');
         assertEquals(customer.ticket.constructor, Ticket);
-        
+
         //Decide not to unbook
         ticket = customer.ticket;
         ticketMachine.scan(customer);
         ticketMachine.cancelUnbook();
         assertEquals(customer.ticket, ticket);
-        
+
         //Decide to unbook
         ticket = customer.ticket;
         ticketMachine.scan(customer);
         ticketMachine.unbookTicket();
         ticketMachine.reset();
         assertEquals(customer.ticket, null);
-        
+
         //Book multiple tickets
         ticketMachine.scan(customer);
         changeCustomer('Simon');
@@ -656,7 +656,7 @@
         changeCustomer('Sami');
         assertEquals(customer.ticket, ticket);
     }
-    
+
     function assertEquals(a, b) {
         var stack, lines, i, line;
         if (a !== b) {
